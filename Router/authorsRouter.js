@@ -1,6 +1,7 @@
 const express =require('express')
 const router = express.Router()
 const Joi = require('joi')
+const {Author} = require('../Models/Author')
 
 const authors =[
     {
@@ -41,8 +42,14 @@ const authors =[
  * @method GET
  * @access public
  */
-router.get("/", (req, res) => {
-    res.status(200).json(authors);
+router.get("/", async(req, res) => {
+  try {
+    const AutherList = await Author.find()
+    res.status(200).json(AutherList);
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({message : "somthing went wrong "})
+  }
   });
   
 
@@ -52,14 +59,19 @@ router.get("/", (req, res) => {
  * @method GET
  * @access public
  */
-router.get("/:id", (req, res) => {
-    const author = authors.find((A) => A.id === parseInt(req.params.id));
+router.get("/:id",async (req, res) => {
+   try {
+    const author = await Author.findById(req.params.id)
   
     if (author) {
       res.status(200).json(author);
     } else {
       res.status(404).json({ message: "author not found" });
     }
+   } catch (error) {
+    console.log(error)
+    res.status(500).json({message:"somthing went wtong"})
+   }
   });
 
 
@@ -69,20 +81,28 @@ router.get("/:id", (req, res) => {
  * @method POST
  * @access public
  */
-router.post("/", (req, res) => {
+router.post("/",async (req, res) => {
     const { error } = ValidateCreateNewAuthore(req.body);
     if (error) {
       res.status(404).json({ message: error.details[0].message });
     }
   
-    const author = {
-      id: authors.length + 1,
+   try {
+    const author = Author ({
+      
       fiestName: req.body.fiestName,
       lastName: req.body.lastName,
       nationalty: req.body.nationalty,
-    };
-    authors.push(author);
-    res.status(201).json(author); //201 create sucsufly new author
+    });
+    //save in Db
+  const resulte = await author.save();
+
+    res.status(201).json(resulte);
+
+   } catch (error) {
+    console.log(error)
+    res.status(500).json({message : "somthing went  wrong"})
+   } 
   });
 
 
