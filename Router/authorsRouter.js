@@ -1,40 +1,9 @@
 const express =require('express')
 const router = express.Router()
-const Joi = require('joi')
-const {Author} = require('../Models/Author')
 
-const authors =[
-    {
-        id : 1 ,
-        fiestName : "fethi",
-        lastName : "medss",
-        nationalty :"algeriane"
-    },
-    {
-        id : 1 ,
-        fiestName : "fethi",
-        lastName : "medss",
-        nationalty :"algeriane"
-    },
-    {
-        id : 2 ,
-        fiestName : "amine",
-        lastName : "jdh",
-        nationalty :"algeriane"
-    },
-    {
-        id : 3 ,
-        fiestName : "jak",
-        lastName : "nbhg",
-        nationalty :"tunsiane"
-    },
-    {
-        id : 4 ,
-        fiestName : "amir",
-        lastName : "ben",
-        nationalty :"marocane"
-    }, 
-]
+const {Author ,ValidateCreateNewAuthore,ValidateUpDateAuthor} = require('../Models/Author')
+
+
 
 /**
  * @desc get authors
@@ -113,19 +82,28 @@ router.post("/",async (req, res) => {
  * @access public
  */
 
-router.put("/:id", (req, res) => {
-
+router.put("/:id",async (req, res) => {
+// validation fo reqeourment what u want to upDate
     const { error } = ValidateUpDateAuthor(req.body);
     if (error) {
       res.status(404).json({ message: error.details[0].message });
     }
-const author = authors.find(b=>b.id === parseInt(req.params.id))
-if (author) {
-    res.status(200).json({message:"author has been Update"})
-}
-else{
-    res.status(404).json({message:"author not found"})
-}
+      
+ try {
+
+  const author = await Author.findByIdAndUpdate(req.params.id , {
+    $set: {
+      fiestName:req.body.fiestName,
+      lastName:req.body.lastName ,
+      nationalty :req.body.nationalty
+    }
+  } ,{new : true})
+  res.status(200).json(author)
+ } catch (error) {
+  console.log(error)
+  res.status(500).json({message : "somthing went wrong ! "})
+ }
+
 });
 
 
@@ -136,44 +114,23 @@ else{
  * @access public
  */
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", async(req, res) => {
 
-   
-    const author = authors.find(A=>A.id === parseInt(req.params.id))
+   try {
+    const author = await Author.findById(req.params.id)
     if (author) {
+      await Author.findByIdAndDelete(req.params.id)
         res.status(200).json({message:"author has been deleted"})
     }
     else{
         res.status(404).json({message:"author not found"})
     }
-    });
+   } catch (error) {
 
-
-
-
-//function for validate create new authore 
-  function ValidateCreateNewAuthore(obj) {
-    //validate for req .body nothing is empty
-    const schema = Joi.object({
-    fiestName: Joi.string().trim().min(3).max(35).required(),
-    lastName: Joi.string().trim().min(3).max(35).required(),
-    nationalty: Joi.string().trim().min(3).max(50).required(),
-    });
-    return schema.validate(obj);
-  }
-  
-
-//function for validate Update   authore 
-  function ValidateUpDateAuthor(obj) {
+    console.log(error)
+  res.status(500).json({message : "somthing went wrong ! "})
+   }
    
-   //validate for req .body nothing is empty
-   const schema = Joi.object({
-    fiestName: Joi.string().trim().min(3).max(35),
-    lastName: Joi.string().trim().min(3).max(35),
-    nationalty: Joi.string().trim().min(3).max(50),
     });
-    return schema.validate(obj);
-  }
-
 
 module.exports =router
