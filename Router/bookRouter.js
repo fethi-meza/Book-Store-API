@@ -1,56 +1,7 @@
 const express = require("express");
-const Joi = require("joi");
+const {Book ,ValidateCreateNewBook ,ValidateUpDateBook} = require('../Models/Book')
 const router = express.Router();
-const books = [
-  {
-    id: 1,
-    title: "rechard o",
-    author: "pahdb",
-    description: "about balanck",
-    price: 100,
-    cover: "soft cover",
-  },
-  {
-    id: 2,
-    title: "rexcvc o",
-    author: "vbcvbcv",
-    description: "about balanck",
-    price: 20,
-    cover: "soft cover",
-  },
-  {
-    id: 3,
-    title: "threa",
-    author: "hfjdjds",
-    description: "about balanck",
-    price: 320,
-    cover: "soft cover",
-  },
-  {
-    id: 4,
-    title: "threa",
-    author: "hfjdjds",
-    description: "about balanck",
-    price: 320,
-    cover: "soft cover",
-  },
-  {
-    id: 5,
-    title: "threa",
-    author: "hfjdjds",
-    description: "about balanck",
-    price: 320,
-    cover: "soft cover",
-  },
-  {
-    id: 6,
-    title: "threa",
-    author: "hfjdjds",
-    description: "about balanck",
-    price: 320,
-    cover: "soft cover",
-  },
-];
+
 
 /**
  * @desc get all books
@@ -58,8 +9,14 @@ const books = [
  * @method GET
  * @access public
  */
-router.get("/", (req, res) => {
-  res.status(200).json(books);
+router.get("/", async(req, res) => {
+  try {
+    const Books = await Book.find().populate("author" ,["_id","fiestName" ,"lastName","nationalty"]);
+    res.status(200).json(Books)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({message :"somthing went wrong ! in server connction"})
+  }
 });
 
 /**
@@ -68,14 +25,20 @@ router.get("/", (req, res) => {
  * @method GET
  * @access public
  */
-router.get("/:id", (req, res) => {
-  const book = books.find((b) => b.id === parseInt(req.params.id));
-
+router.get("/:id", async(req, res) => {
+  //will give all properoty
+  const book = await Book.findById(req.params.id).populate("author")
+try {
   if (book) {
     res.status(200).json(book);
   } else {
     res.status(404).json({ message: "Book not found" });
   }
+} catch (error) {
+  console.log(error)
+    res.status(500).json({message :"somthing went wrong"})
+}
+ 
 });
 
 /**
@@ -84,23 +47,28 @@ router.get("/:id", (req, res) => {
  * @method POST
  * @access public
  */
-router.post("/", (req, res) => {
+router.post("/", async(req, res) => {
   const { error } = ValidateCreateNewBook(req.body);
   if (error) {
     res.status(404).json({ message: error.details[0].message });
   }
 
-  const book = {
-    id: books.length + 1,
+ try {
+  const book = new Book({
+
     title: req.body.title,
     author: req.body.author,
     description: req.body.description,
     price: req.body.price,
     cover: req.body.cover,
-  };
+  });
 
-  books.push(book);
-  res.status(201).json(book); //201 create sucsufly new booke
+  const result = await  book.save();
+  res.status(201).json(result);
+ } catch (error) {
+  console.log(error)
+  res.status(500).json({message :"somthing went wrong"})
+ } 
 });
 
 /**
@@ -110,19 +78,41 @@ router.post("/", (req, res) => {
  * @access public
  */
 
-router.put("/:id", (req, res) => {
+
+
+
+
+
+
+
+router.put("/:id", async (req, res) => {
 
     const { error } = ValidateUpDateBook(req.body);
     if (error) {
       res.status(404).json({ message: error.details[0].message });
     }
-const book = books.find(b=>b.id === parseInt(req.params.id))
-if (book) {
-    res.status(200).json({message:"book has been Update"})
-}
-else{
-    res.status(404).json({message:"book not found"})
-}
+
+    try {
+
+      const book = await Book.findByIdAndUpdate(req.params.id , {
+        $set: {
+          title : req.body.title,
+          author : req.body.author,
+          description : req.body.description,
+          price : req.body.price,
+          cover : req.body.cover,
+        }
+      } ,{new : true});
+      res.status(200).json(book)
+     } catch (error) {
+      console.log(error)
+      res.status(500).json({message : "somthing went wrong ! "})
+     }
+    
+    
+
+
+
 });
 
 /**
@@ -132,42 +122,24 @@ else{
  * @access public
  */
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", async(req, res) => {
 
-   
-const book = books.find(b=>b.id === parseInt(req.params.id))
+   try {
+    const book = Book.findById(req.params.id)
 if (book) {
+    await Book.findByIdAndDelete(req.params.id)
     res.status(200).json({message:"book has been deleted"})
 }
 else{
     res.status(404).json({message:"book not found"})
 }
+   } catch (error) {
+    console.log(error)
+    res.status(500).json({message : "somthinh went wrong !"})
+   }
+
 });
 
-//function for validate create new book
-function ValidateCreateNewBook(obj) {
-  //validate for req .body nothing is empty
-  const schema = Joi.object({
-    title: Joi.string().trim().min(3).max(30).required(),
-    author: Joi.string().trim().min(3).max(30).required(),
-    description: Joi.string().trim().min(3).max(500).required(),
-    price: Joi.number().min(1).max(200).required(),
-    cover: Joi.string().trim().required(),
-  });
-  return schema.validate(obj);
-}
 
-//function for validate  Update authore
-function ValidateUpDateBook(obj) {
-  //validate for req .body nothing is empty
-  const schema = Joi.object({
-    title: Joi.string().trim().min(3).max(30),
-    author: Joi.string().trim().min(3).max(30),
-    description: Joi.string().trim().min(3).max(500),
-    price: Joi.number().min(1).max(200),
-    cover: Joi.string().trim(),
-  });
-  return schema.validate(obj);
-}
 
 module.exports = router;
