@@ -2,8 +2,9 @@ const express = require("express");
 const mongoos = require("mongoose");
 const booksRouter = require("./Router/bookRouter");
 const authorsRouter = require("./Router/authorsRouter");
-const {logger, ErrorHendler}= require('./log/logger')
-
+const auth = require("./Router/auth");
+const {logger}= require('./log/logger')
+const { ErrorHendler, Notfound}= require('./log/Errors')
 //config env
 require('dotenv').config()
 
@@ -24,19 +25,18 @@ const app = express();
 
 
 
-//Apply middliwares
+//Apply Middlewares
 app.use(express.json());
 
+//loogers
 app.use(logger)
 
 //Routes
 app.use("/api/books", booksRouter);
 app.use("/api/authors", authorsRouter);
-app.use((req,res, next)=>{
-const error = new Error(`not found  -${req.originalUrl}`)
-res.status(404)
-next(error)
-})
+app.use("/api/auth",auth)
+//Eroore hanlder Middleware
+app.use(Notfound)
 app.use(ErrorHendler)
 
 // runnunig server
