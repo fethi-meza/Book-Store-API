@@ -42,7 +42,7 @@ const User = mongoos.model("User",UserSchema)
 
 function ValidateRegisterUser(obj){
 const Schema =Joi.object({
-    email :Joi.string().trim().unique().max(100).min(5).required().email() ,
+    email :Joi.string().trim().min(5).max(100).email(),
     username :Joi.string().trim().max(200).min(2).required(),
     password :Joi.string().trim().min(8).required(),
     isAdmine : Joi.boolean()
@@ -65,7 +65,7 @@ function ValidateLoginUser(obj){
 
 function ValidateUpdateUser(obj){
     const Schema =Joi.object({
-        email :Joi.string().trim().unique().max(100).min(5).email() ,
+        email :Joi.string().trim().unique().min(5).max(100).email() ,
         username :Joi.string().trim().max(200).min(2),
         password :Joi.string().trim().min(8),
         isAdmine : Joi.boolean()

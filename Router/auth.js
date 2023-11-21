@@ -5,23 +5,26 @@ const {User,ValidateLoginUser,ValidateRegisterUser}= require('../Models/User')
 
 /**
  * @desc Register New User 
- * @route /api/Register
+ * @route /api/auth/Register
  * @method POST
  * @access public
  */
-router.post('/register', async(req,res)=>{
+router.post('/Register', async(req,res)=>{
 try {
     const {error} = ValidateRegisterUser(req.body);
     if(error){
-        res.status(500).json({message : error.details[0].message})
+       return res.status(400).json({message : error.details[0].message})
     }
+
+    //testing if this user eamil is ready existing(chek in bd)
 let user = await User.findOne({email : req.body.email}); 
+
 if(user){
-res.status(400).json({message:"this user is Already Registered "})
+ return res.status(400).json({message:"this user is Already Registered "})
 }
 
  user = new User ({
-  eamil :req.body.eamil ,
+    email :req.body.email ,
   username :req.body.username ,
   password :req.body.password ,
   isAdmine :req.body.isAdmine ,
