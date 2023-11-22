@@ -1,5 +1,6 @@
 const express = require("express");
-const mongoos = require("mongoose");
+//const mongoos = require("mongoose");
+const connectDB =require('./DB/DBM')
 const booksRouter = require("./Router/bookRouter");
 const authorsRouter = require("./Router/authorsRouter");
 const auth = require("./Router/auth");
@@ -12,11 +13,7 @@ require('dotenv').config()
 const port = 3000 || process.env.PORT;
 
 //connection Db
-mongoos
-.connect(process.env.MONGO_URI)
-.then(() => console.log("conncted To Mongo DB"))
-.catch((error) => console.log("conncetion is failde ", error));
-
+connectDB();
 
 
 // Init App
