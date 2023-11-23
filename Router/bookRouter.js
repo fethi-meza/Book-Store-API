@@ -32,11 +32,11 @@ try {
   if (book) {
     res.status(200).json(book);
   } else {
-    res.status(404).json({ message: "Book not found" });
+    res.status(404).json({message: "Book not found" });
   }
 } catch (error) {
   console.log(error)
-    res.status(500).json({message :"somthing went wrong"})
+    res.status(500).json({  message :"somthing went wrong"})
 }
  
 });
