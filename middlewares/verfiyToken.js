@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-require('dotenv').config()
+require('dotenv').config({path :config.env})
 
 const verfiyToken =async(req,res,next)=>{
     const token = req.Header.token
