@@ -8,7 +8,7 @@ const {verfiyToken} = require('../middlewares/verfiyToken')
 
 
 /**
- * @desc Update User
+ * @desc Update User :
  * @route /api/User/:id
  * @method PUT
  * @access private
