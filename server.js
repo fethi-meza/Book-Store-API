@@ -8,7 +8,7 @@ const User = require("./Router/users");
 const {logger}= require('./middlewares/logger')
 const { ErrorHendler, Notfound}= require('./middlewares/Errors')
 //config env
-require('dotenv').config({path :config.env})
+require('dotenv').config({path :"./config.env"})
 
 
 const port = 3000 || process.env.PORT;

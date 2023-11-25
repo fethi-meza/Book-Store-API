@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require('bcrypt')
 const { User,ValidateUpdateUser}= require('../Models/User')
-const {verfiyToken} = require('../middlewares/verfiyToken')
+const { veryfiyTokenAndAuthourization} = require('../middlewares/verfiyToken')
 
 
 
@@ -13,13 +13,9 @@ const {verfiyToken} = require('../middlewares/verfiyToken')
  * @method PUT
  * @access private
  */
-router.put("/:id", verfiyToken, async(req,res)=>{
+router.put("/:id", veryfiyTokenAndAuthourization, async(req,res)=>{
     try {
-        if ( req.user.id != req.params.id) {
-            return res.status(403)// forbidden 
-            .json({success : false , message :'you are not allowed  , you only can update your profile'})
-            
-        }
+        
         const { error } = ValidateUpdateUser(req.body);
         if (error) {
           return res.status(400).json({success:false, message: error.details[0].message });

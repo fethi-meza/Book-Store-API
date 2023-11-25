@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-require('dotenv').config({path :config.env})
+require('dotenv').config({path :"./config.env"})
 const {
   User,
   ValidateLoginUser,
@@ -44,12 +44,7 @@ req.body.password  =await bcrypt.hash(req.body.password ,salt)
 
     const result = await user.save();
 
-    const token = jwt.sign({ id : user._id  , isAdmine :user.isAdmine} , process.env.JWT_SECRET_KEY
-      //{
-       //how long time to you can use it and will change it 
-       //after 6 hours : you can use d for day => h for hours => m for mint
-       // expiresIn : "6h"}
-       )
+    const token = jwt.sign({ id : user._id  , isAdmine :user.isAdmine} , process.env.JWT_SECRET_KEY)
 // without the pasword for the result 
 const {password ,...othre}=result._doc
 
