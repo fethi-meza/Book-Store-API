@@ -4,8 +4,9 @@ const connectDB =require('./DB/DBM')
 const booksRouter = require("./Router/bookRouter");
 const authorsRouter = require("./Router/authorsRouter");
 const auth = require("./Router/auth");
-const {logger}= require('./log/logger')
-const { ErrorHendler, Notfound}= require('./log/Errors')
+const User = require("./Router/users");
+const {logger}= require('./middlewares/logger')
+const { ErrorHendler, Notfound}= require('./middlewares/Errors')
 //config env
 require('dotenv').config()
 
@@ -32,6 +33,8 @@ app.use(logger)
 app.use("/api/books", booksRouter);
 app.use("/api/authors", authorsRouter);
 app.use("/api/auth",auth)
+app.use("/api/users",User)
+
 //Eroore hanlder Middleware
 app.use(Notfound)
 app.use(ErrorHendler)

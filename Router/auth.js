@@ -32,7 +32,7 @@ router.post("/Register", async (req, res) => {
     }
 
 //hasch password
-const salt = await bcrypt.salt(10)
+const salt = await bcrypt.genSalt(10)
 req.body.password  =await bcrypt.hash(req.body.password ,salt)
 
     user = new User({
