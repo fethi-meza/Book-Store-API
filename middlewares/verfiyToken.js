@@ -10,8 +10,8 @@ const verfiyToken =(req,res,next)=>{
         try {
             
     const decoded = jwt.verfiyToken(token , process.env.JWT_SECRET_KEY)
-    req.user =decoded ;
-    next();
+         req.user =decoded ;
+         next();
 
         } catch (error) {
             res.status(401).json({success:false, message: 'invalid token  !'})

@@ -2,6 +2,7 @@ const express =require('express')
 const router = express.Router()
 
 const {Author ,ValidateCreateNewAuthore,ValidateUpDateAuthor} = require('../Models/Author')
+const {veryfiyTokenAndAdmin}= require('../middlewares/verfiyToken')
 
 
 
@@ -48,9 +49,9 @@ router.get("/:id",async (req, res) => {
  * @desc create new author
  * @route /api/authors
  * @method POST
- * @access public
+ * @access private (only admin can do this )
  */
-router.post("/",async (req, res) => {
+router.post("/",veryfiyTokenAndAdmin,async (req, res) => {
     const { error } = ValidateCreateNewAuthore(req.body);
     if (error) {
       res.status(404).json({ message: error.details[0].message });
@@ -79,10 +80,10 @@ router.post("/",async (req, res) => {
  * @desc Update author
  * @route /api/authors
  * @method PUT
- * @access public
+ * @access private (only admin can do this Update )
  */
 
-router.put("/:id",async (req, res) => {
+router.put("/:id",veryfiyTokenAndAdmin,async (req, res) => {
 // validation fo reqeourment what u want to upDate
     const { error } = ValidateUpDateAuthor(req.body);
     if (error) {
@@ -111,10 +112,10 @@ router.put("/:id",async (req, res) => {
  * @desc Delete author
  * @route /api/authors
  * @method DELETE
- * @access public
+ * @access private (only admin can do this Update )
  */
 
-router.delete("/:id", async(req, res) => {
+router.delete("/:id",veryfiyTokenAndAdmin, async(req, res) => {
 
    try {
     const author = await Author.findById(req.params.id)

@@ -1,7 +1,7 @@
 const express = require("express");
 const {Book ,ValidateCreateNewBook ,ValidateUpDateBook} = require('../Models/Book')
 const router = express.Router();
-
+const {veryfiyTokenAndAdmin}= require('../middlewares/verfiyToken')
 
 /**
  * @desc get all books
@@ -47,7 +47,7 @@ try {
  * @method POST
  * @access public
  */
-router.post("/", async(req, res) => {
+router.post("/",veryfiyTokenAndAdmin, async(req, res) => {
   const { error } = ValidateCreateNewBook(req.body);
   if (error) {
     res.status(404).json({ message: error.details[0].message });
@@ -75,17 +75,10 @@ router.post("/", async(req, res) => {
  * @desc Update book
  * @route /api/books
  * @method PUT
- * @access public
+ * @access private (only admin can do this Update)
  */
 
-
-
-
-
-
-
-
-router.put("/:id", async (req, res) => {
+router.put("/:id",veryfiyTokenAndAdmin, async (req, res) => {
 
     const { error } = ValidateUpDateBook(req.body);
     if (error) {
@@ -119,10 +112,10 @@ router.put("/:id", async (req, res) => {
  * @desc Delete book
  * @route /api/books
  * @method PUT
- * @access public
+ * @access private (only admin can do this Delete)
  */
 
-router.delete("/:id", async(req, res) => {
+router.delete("/:id",veryfiyTokenAndAdmin, async(req, res) => {
 
    try {
     const book = Book.findById(req.params.id)
