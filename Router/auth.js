@@ -28,7 +28,7 @@ router.post("/Register", async (req, res) => {
     if (user) {
       return res
         .status(400)
-        .json({ message: "this user is Already Registered " });
+        .json({ success : true,message: "this user is Already Registered " });
     }
 
 //hasch password
@@ -43,11 +43,14 @@ req.body.password  =await bcrypt.hash(req.body.password ,salt)
 
     const result = await user.save();
 
-    const token = jwt.sign({ id : user._id  , isAdmine :user.isAdmine} , process.env.JWT_SECRET_KEY)
+    //generate Token
+    const token = generateToken();
+
+
 // without the pasword for the result 
 const {password ,...othre}=result._doc
 
-//send the proprty only the pasword 
+//send the proporty only the pasword 
     res.status(201).json({...othre ,token});
 
   } catch (error) {
@@ -76,19 +79,15 @@ router.post("/Login", async (req, res) => {
       return res.status(400).json({ message: "invalid eamil or password" });
     }
 
-//comparation beetwen  req.password and passswor in database
+//comparation beetwen  req.password and passsword in database
 const isPaswordMatch = await bcrypt.compare(req.body.password , user.password) ;
 //boolen return true or false
 if (!isPaswordMatch) {
   return res.status(400).json({ message: "invalid eamil or password" });
 }
 
-const token = jwt.sign({ id : user._id  , isAdmine :user.isAdmine} , process.env.JWT_SECRET_KEY
-//{
- //how long time to you can use it and will change it 
- //after 6 hours : you can use d for day => h for hours => m for mint
- // expiresIn : "6h"}
- )
+const token = generateToken();
+
 
 const {password ,...othre}=user._doc
 
